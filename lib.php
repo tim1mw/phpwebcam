@@ -161,7 +161,8 @@ class WebCamHandler {
         if ($this->camdata['fix_stream']) {
             $command .= " ".$CONFIG['ffmpeg_fix'];
         }
-        $command .= " -bufsize ".($stream['bitrate_kbps']*7)."k -stimeout 60000 -hls_flags temp_file -hls_time ".$CONFIG['segment_time'].
+        $command .= " -bufsize ".($stream['bitrate_kbps']*7)."k -stimeout 60000 -segment_list_flags +live -hls_allow_cache 0".
+            " -hls_flags temp_file -hls_time ".$CONFIG['segment_time'].
             " -hls_wrap ".$CONFIG['segment_wrap'];
             //" -hls_flags delete_segments -hls_list_size ".$CONFIG['segment_wrap'];
 
@@ -204,9 +205,9 @@ class WebCamHandler {
         $this->makeThumb($saveto.".jpg", $saveto."-thumb.jpg", 125);
 
         $images = $this->getFiles($this->getStoreDir($stream, 'stills')."/*jpg");
-        $maximage = 30;
+        $maximage = 60;
         if (count($images) > $maximage) {
-            for ($loop=$maximage-2 ; $loop<$maximage; $loop) {
+            for ($loop=$maximage ; $loop<$maximage; $loop) {
                 unlink($images[$loop]);
             }
         }
