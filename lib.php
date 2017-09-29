@@ -264,6 +264,10 @@ class WebCamHandler {
             $path = new stdclass();
             $path->thumb = 'stills/'.$this->camkey."-".$stream['bitrate_kbps'].'/'.basename($image);
             $path->img = str_replace('-thumb.jpg', '.jpg', $path->thumb);
+            // Check that the actual full size still exists, just in case it got deleted manually or the time stamp got changed causing early deletion
+            if (!file_exists($path->img)) {
+                continue;
+            }
             $path->time = date ("dS F Y, H:i", filemtime($image));
             $paths[] = $path;
             $count++;
