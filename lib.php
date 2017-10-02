@@ -331,8 +331,9 @@ class WebCamHandler {
             $path = new stdclass();
             $b = basename($clip);
             $path->thumb = 'vclips/'.$this->camkey."-".$stream['bitrate_kbps'].'/'.$b.'/thumb.jpg';
+            // If the thumbnail file is missing, something must have gone wrong capturing the clip, so skip it
             if (!file_exists($path->thumb)) {
-                $path->thumb = $this->getChannelMask();
+                continue;
             }
             $path->link = 'clipshow.php?camkey='.$this->camkey."&amp;stream=".$stream['bitrate_kbps']."&amp;clip=".$b;
             //$path->time = date ("dS F Y, H:i", filemtime($clip));
