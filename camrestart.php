@@ -18,7 +18,7 @@
         echo "Stopping....\n";
         $camera->stopStreams();
 
-        sleep(7);
+        sleep($CONFIG['segment_time']);
         echo "Starting....\n";
         $camera->startStreams();
 
