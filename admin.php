@@ -4,7 +4,7 @@ require_once('lib.php');
 ?>
 <html>
     <head>
-        <title>Webcam Admin login</title>
+        <title>Webcam Admin</title>
     </head>
     <body>
     <h1>Webcam Admin</h1>
