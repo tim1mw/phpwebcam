@@ -6,6 +6,11 @@ try {
     $camkey = $_GET['camkey'];
     $camera = new WebCamHandler($camkey);
 
+    // Refuse to serve the file if we're in mainteance mode and this isn't an admin
+    if ($camera->maintenanceMode() && !isAdmin()) {
+        exit();
+    }
+
     $str = "#EXTM3U\n";
     $streams = $camera->getStreams();
     foreach ($streams as $stream) {
