@@ -367,7 +367,7 @@ class WebCamHandler {
         shell_exec($CONFIG['ffmpeg']." -loglevel panic -i ".$saveto."/combined.ts -vframes 1 ".$saveto.'/image.jpg');
         $this->makeThumb($saveto."/image.jpg", $saveto."/thumb.jpg", 125);
 
-        shell_exec($CONFIG['ffmpeg']." -loglevel panic -i ".$saveto."/combined.ts -acodec copy -vcodec copy -hls_list_size 0 -hls_time ".$CONFIG['segment_time']." ".$saveto."/clip.m3u8");
+        shell_exec($CONFIG['ffmpeg']." -loglevel panic -i ".$saveto."/combined.ts -hls_playlist_type vod -acodec copy -vcodec copy -hls_list_size 0 -hls_time ".$CONFIG['segment_time']." ".$saveto."/clip.m3u8");
         unlink($saveto."/combined.ts");
 
         $vclips = $this->getStoreDir($stream, 'vclips');
