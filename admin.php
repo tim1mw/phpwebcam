@@ -51,7 +51,8 @@ function adminOptions() {
         <tr>
             <th style="border:1px solid black;">Camera name</td>
             <th style="border:1px solid black;">Hours</td>
-            <th style="border:1px solid black;">Mainteance mode</td>
+            <th style="border:1px solid black;">Stream PID's</td>
+            <th style="border:1px solid black;">Maintenance</td>
             <th style="border:1px solid black;">Actions</td>
         </tr>
 
@@ -62,6 +63,7 @@ function adminOptions() {
             echo "<tr>\n".
                 "    <td style='border:1px solid black;'><a href='/camview.php?camkey=".$camkey."'>".$camera->getName()."</a></td>\n".
                 "    <td style='border:1px solid black;'>".$camera->startTime()." - ".$camera->finishTime()."</td>".
+                "    <td style='border:1px solid black;text-align:center;'>".$camera->streamStatus()."</td>".
                 "    <td style='border:1px solid black;text-align:center;'>".$camera->maintenanceMode()."</td>".
                 "    <td style='border:1px solid black;'><a href='/camrestart.php?camkey=".$camkey."'>Restart feed</td>\n".
                 "</tr>";

@@ -124,6 +124,14 @@ class WebCamHandler {
         }
     }
 
+    function streamStatus() {
+        $status = "";
+        foreach ($this->camdata['camera_streams'] as $stream) {
+            $status .= $stream['bitrate_kbps']."kbps: ".$this->streamRunning($stream)."<br />";
+        }
+        return $status;
+    }
+
     function streamRunning($stream) {
         $url = $this->camdata['camera_base_url'].$stream['url_part'];
 
