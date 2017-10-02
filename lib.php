@@ -145,11 +145,27 @@ class WebCamHandler {
 
     function startStream($stream) {
         global $CONFIG;
+        $storedir = $this->getStoreDir($stream, 'segments');
+        $m3u8_file = $storedir."/streaming.m3u8";
+        $start_number = 0;
+        // If the m3u8 file exists and is less than 2 mins old, try setting the media sequence to persuade clients to continue playing.
+        if (file_exists($m3u8_file) && time()-filemtime($m3u8_file) < 120) {
+            $m3u8 = file_get_contents($m3u8_file);
+            $m3u8_parts = explode("\n", $m3u8);
+            foreach ($m3u8_parts as $part) {
+                $elements = explode(':', $part);
+                if ($elements[0] == "#EXT-X-MEDIA-SEQUENCE") {
+                    $start_number = intval($elements[1])+5;
+                    break;
+                }
+            }
+        }
+        else {
+            shell_exec("rm -f ".$storedir."/*");
+        }
 
-        shell_exec("rm -f ".$this->getStoreDir($stream, 'segments')."/*");
-
-        $command = $this->getbaseCommand($stream).
-            " ".$CONFIG['ffmpeg_encode']." ".$this->getStoreDir($stream, 'segments')."/streaming.m3u8";
+        $command = $this->getbaseCommand($stream).' -start_number '.$start_number.
+            " ".$CONFIG['ffmpeg_encode']." ".$m3u8_file;
 
         $command .= " > ".$CONFIG['log_dir']."/".$stream['url_part']."_".date('Y-m-d_H:i:s').".log 2>&1";
 
@@ -160,6 +176,14 @@ class WebCamHandler {
         sleep(1);
     }
 
+    function stopStream($stream) {
+        global $CONFIG;
+        $pid = $this->streamRunning($stream);
+        if ($pid) {
+            shell_exec("kill ".$pid);
+        }
+    }
+
     function getStoreDir($stream, $type) {
         global $CONFIG;
         return $this->dir."/".$type."/".$this->camkey."-".$stream['bitrate_kbps'];
@@ -168,7 +192,7 @@ class WebCamHandler {
     function getBaseCommand($stream) {
         global $CONFIG;
 
-        $command = $CONFIG['ffmpeg']." -loglevel ".$CONFIG['log_level']. " -err_detect ignore_err -bug trunc ";
+        $command = $CONFIG['ffmpeg']." -loglevel ".$CONFIG['log_level']. " -err_detect ignore_err -bug trunc";
 
         if ($this->camdata['fix_framerate']) {
             $command .= " -r ".$stream['frame_rate'];
@@ -182,7 +206,7 @@ class WebCamHandler {
         }
         $command .= " -bufsize ".($stream['bitrate_kbps']*7)."k -stimeout 60000".
             " -segment_list_flags +live -hls_allow_cache 0 ".
-            " -hls_flags temp_file -hls_time ".$CONFIG['segment_time'].
+            " -hls_flags temp_file+omit_endlist+discont_start -hls_time ".$CONFIG['segment_time'].
             " -hls_wrap ".$CONFIG['segment_wrap'].
             " -muxpreload 15 -muxdelay 15";
             //" -hls_flags delete_segments -hls_list_size ".$CONFIG['segment_wrap'];
@@ -376,14 +400,6 @@ class WebCamHandler {
             for ($loop=$maxvclip; $loop<$maxvclip; $loop) {
                 shell_exec("rm -rf ".$vclips[$loop]);
             }
-        }
-    }
-
-    function stopStream($stream) {
-        global $CONFIG;
-        $pid = $this->streamRunning($stream);
-        if ($pid) {
-            shell_exec("kill ".$pid);
         }
     }
 }

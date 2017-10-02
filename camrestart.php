@@ -18,7 +18,7 @@
         echo "Stopping....\n";
         $camera->stopStreams();
 
-        sleep(5);
+        sleep(7);
         echo "Starting....\n";
         $camera->startStreams();
 
