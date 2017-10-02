@@ -145,7 +145,7 @@ class WebCamHandler {
 
         $command .= " > ".$CONFIG['log_dir']."/".$stream['url_part']."_".date('Y-m-d_H:i:s').".log 2>&1";
 
-        echo $command."\n\n";
+        echo $command."\n";
 
         shell_exec("nohup ".$command." > /dev/null & echo $!");
         // FFMPEG dies if we start too many instances too close together talking to the same camera, so pause for a moment.

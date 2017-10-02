@@ -5,13 +5,9 @@ require_once('lib.php');
 <html>
     <head>
         <title>Webcam Admin login</title>
-        <link href="video-js.min.css" rel="stylesheet" />
-        <link href="style.css" rel="stylesheet" />
-        <script type='text/javascript' src="video.min.js"></script>
-        <script type='text/javascript' src="videojs-contrib-hls.min.js"></script>
     </head>
     <body>
-    <h1>Webcam Admin login</h1>
+    <h1>Webcam Admin</h1>
 
     <?php
     session_start();
@@ -31,7 +27,7 @@ require_once('lib.php');
     }
 
     if (array_key_exists('admin', $_SESSION) && $_SESSION['admin']===true) {
-        ?><p>Logged in.</p><p><a href='admin.php?logout'>Logout</a></p><?php
+        adminOptions();
     } else {
     ?>
         <form action="admin.php" method='post'>
@@ -45,3 +41,32 @@ require_once('lib.php');
     ?>
     </body>
 </html>
+
+<?php
+function adminOptions() {
+    ?>
+    <p>Logged in as admin</p><p><a href='admin.php?logout'>Logout</a></p>
+    <h4>Available cameras</h4>
+    <table style="border:1px solid black";>
+        <tr>
+            <th style="border:1px solid black;">Camera name</td>
+            <th style="border:1px solid black;">Hours</td>
+            <th style="border:1px solid black;">Mainteance mode</td>
+            <th style="border:1px solid black;">Actions</td>
+        </tr>
+
+        <?php
+        $cams = WebCamHandler::getAllCamKeys();
+        foreach ($cams as $camkey) {
+            $camera = new WebCamHandler($camkey);
+            echo "<tr>\n".
+                "    <td style='border:1px solid black;'><a href='/camview.php?camkey=".$camkey."'>".$camera->getName()."</a></td>\n".
+                "    <td style='border:1px solid black;'>".$camera->startTime()." - ".$camera->finishTime()."</td>".
+                "    <td style='border:1px solid black;text-align:center;'>".$camera->maintenanceMode()."</td>".
+                "    <td style='border:1px solid black;'><a href='/camrestart.php?camkey=".$camkey."'>Restart feed</td>\n".
+                "</tr>";
+        }
+        ?>
+    </table>
+<?php
+}
