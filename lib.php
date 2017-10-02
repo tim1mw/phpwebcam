@@ -68,6 +68,11 @@ class WebCamHandler {
     }
 
     function cameraOn($offset = false) {
+
+        if (isAdmin() && $this->maintenanceMode()) {
+            return true;
+        }
+
         $start = $this->camdata['start'];
         $finish = $this->camdata['finish'];
 
@@ -77,7 +82,7 @@ class WebCamHandler {
         }
 
         $now = date("Hi");
-        if ($now > $this->camdata['start'] && $now < $this->camdata['finish'] && !$this->camdata['maintenance']) {
+        if ($now > $this->camdata['start'] && $now < $this->camdata['finish'] && !$this->maintenanceMode()) {
             return true;
         } else {
             return false;
@@ -89,7 +94,13 @@ class WebCamHandler {
     }
 
     function checkStreams() {
-        $runcam = $this->cameraOn(true);
+        // When we are in maintenance mode, start the camera, otherwise obey cameraOn.
+        if ($this->maintenanceMode()) {
+            $runcam = true;
+        } else {
+            $runcam = $this->cameraOn(true);
+        }
+
         if ($runcam) {
             $this->startStreams();
         } else {
@@ -161,9 +172,11 @@ class WebCamHandler {
         if ($this->camdata['fix_stream']) {
             $command .= " ".$CONFIG['ffmpeg_fix'];
         }
-        $command .= " -bufsize ".($stream['bitrate_kbps']*7)."k -stimeout 60000 -segment_list_flags +live -hls_allow_cache 0".
+        $command .= " -bufsize ".($stream['bitrate_kbps']*7)."k -stimeout 60000".
+            " -segment_list_flags +live -hls_allow_cache 0 ".
             " -hls_flags temp_file -hls_time ".$CONFIG['segment_time'].
-            " -hls_wrap ".$CONFIG['segment_wrap'];
+            " -hls_wrap ".$CONFIG['segment_wrap'].
+            " -muxpreload 15 -muxdelay 15";
             //" -hls_flags delete_segments -hls_list_size ".$CONFIG['segment_wrap'];
 
         return $command;
@@ -365,6 +378,18 @@ class WebCamHandler {
             shell_exec("kill ".$pid);
         }
     }
+}
+
+function isAdmin() {
+    if (session_status() == PHP_SESSION_NONE) {
+        session_start();
+    }
+
+    if (array_key_exists('admin', $_SESSION) && $_SESSION['admin']===true) {
+        return true;
+    } else {
+        return false;
+    } 
 }
 
 class CameraNotFoundException extends Exception {

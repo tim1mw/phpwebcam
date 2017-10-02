@@ -10,7 +10,17 @@
         <script type='text/javascript'>
             var camKey="<?php echo $camkey ?>";
             var camOn=<?php if ($camera->cameraOn()) {echo "true";} else {echo "false";} ?>;
-            var maintenanceMode=<?php if ($camera->maintenanceMode()) {echo "true";} else {echo "false";} ?>;
+            var maintenanceMode=<?php 
+                if (isAdmin()) {
+                    echo "false";
+                } else {
+                    if ($camera->maintenanceMode()) {
+                        echo "true";
+                    } else {
+                        echo "false";
+                    }
+                }
+            ?>;
             var startTime="<?php echo $camera->startTime(); ?>";
             var endTime="<?php echo $camera->finishTime()." ".date('T'); ?>";
         </script>

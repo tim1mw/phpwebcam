@@ -1,6 +1,7 @@
 <?php
 
 $CONFIG = [
+    'adminpass' => '',
     'ffmpeg' => '',
     'ffmpeg_fix' => '',
     'ffmpeg_encode' => '',
