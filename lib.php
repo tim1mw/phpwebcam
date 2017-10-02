@@ -168,7 +168,7 @@ class WebCamHandler {
     function getBaseCommand($stream) {
         global $CONFIG;
 
-        $command = $CONFIG['ffmpeg']." -loglevel ".$CONFIG['log_level'];
+        $command = $CONFIG['ffmpeg']." -loglevel ".$CONFIG['log_level']. " -err_detect ignore_err -bug trunc ";
 
         if ($this->camdata['fix_framerate']) {
             $command .= " -r ".$stream['frame_rate'];
