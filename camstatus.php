@@ -10,9 +10,9 @@ try {
     $r->cameraOn = $camera->cameraOn();
     // If this is an admin, override maintenance mode
     if (isAdmin()) {
-        $r->maintenanceMode = $camera->maintenanceMode();
-    } else {
         $r->maintenanceMode = false;
+    } else {
+        $r->maintenanceMode = $camera->maintenanceMode();
     }
 } catch (CameraNotFoundException $e) {
     $r->cameraOn = false;
