@@ -250,9 +250,9 @@ class WebCamHandler {
         $this->makeThumb($saveto.".jpg", $saveto."-thumb.jpg", 125);
 
         $images = $this->getFiles($this->getStoreDir($stream, 'stills')."/*jpg");
-        $maximage = 60;
+        $maximage = 70;
         if (count($images) > $maximage) {
-            for ($loop=$maximage ; $loop<$maximage; $loop) {
+            for ($loop=$maximage+1 ; $loop<count($images); $loop++) {
                 unlink($images[$loop]);
             }
         }
@@ -355,6 +355,7 @@ class WebCamHandler {
 
     function captureVclip() {
         global $CONFIG;
+
         if (!$this->cameraOn()) {
             return;
         }
@@ -395,15 +396,17 @@ class WebCamHandler {
         shell_exec($CONFIG['ffmpeg']." -loglevel panic -i ".$saveto."/combined.ts -hls_playlist_type vod -acodec copy -vcodec copy -hls_list_size 0 -hls_time ".$CONFIG['segment_time']." ".$saveto."/clip.m3u8");
         unlink($saveto."/combined.ts");
 
-        $vclips = $this->getStoreDir($stream, 'vclips');
+        $vclips = $this->getFiles($this->getStoreDir($stream, 'vclips')."/*");
         $maxvclip = 30;
         if (count($vclips) > $maxvclip) {
-            for ($loop=$maxvclip; $loop<$maxvclip; $loop) {
+            for ($loop=$maxvclip+1; $loop<count($vclips); $loop++) {
                 shell_exec("rm -rf ".$vclips[$loop]);
             }
         }
+
     }
 }
+
 
 function isAdmin() {
     if (session_status() == PHP_SESSION_NONE) {
