@@ -10,10 +10,20 @@ if (!isset($argc) || is_null($argc))
 
 require_once('lib.php');
 
+$starttime = time();
+
 $cams = WebCamHandler::getAllCamKeys();
 foreach ($cams as $camkey) {
     $camera = new WebCamHandler($camkey);
     $camera->checkStreams();
     $camera->captureImage();
     $camera->captureVclip();
+}
+
+// This improves the restart frequency when things go wrong....
+$diff = time() - $starttime;
+while ($diff < 45) {
+ sleep(10);
+ $camera->checkStreams();
+ $diff = time() - $starttime;
 }

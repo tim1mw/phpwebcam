@@ -148,8 +148,8 @@ class WebCamHandler {
         $storedir = $this->getStoreDir($stream, 'segments');
         $m3u8_file = $storedir."/streaming.m3u8";
         $start_number = 0;
-        // If the m3u8 file exists and is less than 2 mins old, try setting the media sequence to persuade clients to continue playing.
-        if (file_exists($m3u8_file) && time()-filemtime($m3u8_file) < 120) {
+        // If the m3u8 file exists and is less than 3 mins old, try setting the media sequence to persuade clients to continue playing.
+        if (file_exists($m3u8_file) && time()-filemtime($m3u8_file) < 180) {
             $m3u8 = file_get_contents($m3u8_file);
             $m3u8_parts = explode("\n", $m3u8);
             foreach ($m3u8_parts as $part) {
