@@ -336,7 +336,6 @@ class WebCamHandler {
                 continue;
             }
             $path->link = 'clipshow.php?camkey='.$this->camkey."&amp;stream=".$stream['bitrate_kbps']."&amp;clip=".$b;
-            //$path->time = date ("dS F Y, H:i", filemtime($clip));
             $path->time = file_get_contents('vclips/'.$this->camkey."-".$stream['bitrate_kbps'].'/'.$b.'/date.txt');
             $paths[] = $path;
             $count++;

@@ -125,7 +125,42 @@ body {
  margin:0px;
 }
 
+.thumbnailcont {
+ float:left;
+ display:inline;
+ margin:2px;
+}
+
 .thumbnail {
  width:125px;
  height:70px;
+ display:block;
+}
+
+.thumbnailtext {
+ color:white;
+ font-size:x-small;
+ text-decoration:none;
+ font-weight:bold;
+}
+
+.thumbinner {
+ padding-top:45px;
+}
+
+.thumbmask {
+ background:black;
+ opacity:0.5;
+}
+
+.vclip-title {
+ text-align:center;
+ font-family: sans;
+ font-weight:bold;
+ width:790px;
+ color:white;
+ background:#880000;
+ margin-left:auto;
+ margin-right:auto;
+ margin-bottom:2px;
 }
