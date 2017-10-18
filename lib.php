@@ -204,11 +204,7 @@ class WebCamHandler {
         $command .= " -i ".$this->camdata['camera_base_url'].$stream['url_part'];
 */
 
-        $transport = "";
-        if ($this->camdata['rtsp_transport'] == "tcp") {
-            $transport = "-t";
-        }
-        $command = $CONFIG['openrtsp']." -D 10 -v ".$transport." -c -b ".($stream['bitrate_kbps']*500)." ".$this->camdata['camera_base_url'].$stream['url_part']." | ";
+        $command = $CONFIG['openrtsp']." -D 10 -v ".$stream['rtsp_params']." -c -b ".($stream['bitrate_kbps']*500)." ".$this->camdata['camera_base_url'].$stream['url_part']." | ";
         $command .= $CONFIG['ffmpeg']." -r ".$stream['frame_rate']." -i -";
 
         if ($this->camdata['fix_stream']) {

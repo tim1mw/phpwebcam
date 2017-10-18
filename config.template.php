@@ -19,16 +19,15 @@ $CAMERAS = [
         'finish' => '',
         'maintenance' => false,
         'camera_base_url' => '',
-        'rtsp_transport' => 'tcp',
         'fix_stream' => true,
-        'fix_framerate' => true,
         'poster_image' => '',
         'channel_mask' => '',
         'camera_streams' => array(
             '0' => array(
                 'url_part' => '',
                 'bitrate_kbps' => ,
-                'frame_rate' => 
+                'frame_rate' => ,
+                'rtsp_params' => ''
             ),
         ),
         'still_times' => array(
