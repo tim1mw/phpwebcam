@@ -21,9 +21,12 @@ foreach ($cams as $camkey) {
 }
 
 // This improves the restart frequency when things go wrong....
+/*
 $diff = time() - $starttime;
 while ($diff < 45) {
- sleep(10);
+ sleep(20);
  $camera->checkStreams();
  $diff = time() - $starttime;
 }
+
+*/
