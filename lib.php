@@ -182,6 +182,10 @@ class WebCamHandler {
         if ($pid) {
             shell_exec("kill ".$pid);
         }
+
+        $storedir = $this->getStoreDir($stream, 'segments');
+        $m3u8_file = $storedir."/streaming.m3u8";
+        file_put_contents($m3u8_file, "#EXTM3U\n");
     }
 
     function getStoreDir($stream, $type) {
