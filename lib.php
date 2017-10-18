@@ -135,7 +135,7 @@ class WebCamHandler {
     function streamRunning($stream) {
         $url = $this->camdata['camera_base_url'].$stream['url_part'];
 
-        $out = shell_exec("ps -f -C ffmpeg | grep ".$url." | awk '{print $2}'");
+        $out = shell_exec("ps -f -C openRTSP | grep ".$url." | awk '{print $2}'");
         if (strlen($out) > 0) {
             return intval($out);
         }
@@ -192,6 +192,7 @@ class WebCamHandler {
     function getBaseCommand($stream) {
         global $CONFIG;
 
+/*
         $command = $CONFIG['ffmpeg']." -loglevel ".$CONFIG['log_level']. " -err_detect ignore_err -bug trunc";
 
         if ($this->camdata['fix_framerate']) {
@@ -201,6 +202,15 @@ class WebCamHandler {
             $command .= " -rtsp_transport ".$this->camdata['rtsp_transport'];
         }
         $command .= " -i ".$this->camdata['camera_base_url'].$stream['url_part'];
+*/
+
+        $transport = "";
+        if ($this->camdata['rtsp_transport'] == "tcp") {
+            $transport = "-t";
+        }
+        $command = $CONFIG['openrtsp']." -D 10 -v ".$transport." -c -b ".($stream['bitrate_kbps']*500)." ".$this->camdata['camera_base_url'].$stream['url_part']." | ";
+        $command .= $CONFIG['ffmpeg']." -r ".$stream['frame_rate']." -i -";
+
         if ($this->camdata['fix_stream']) {
             $command .= " ".$CONFIG['ffmpeg_fix'];
         }
