@@ -163,6 +163,9 @@ class WebCamHandler {
         else {
             shell_exec("rm -f ".$storedir."/*");
         }
+        if (file_exists($m3u8_file)) {
+            unlink($m3u8_file);
+        }
 
         $command = $this->getbaseCommand($stream).' -start_number '.$start_number.
             " ".$CONFIG['ffmpeg_encode']." ".$m3u8_file;
@@ -171,7 +174,13 @@ class WebCamHandler {
 
         echo $command."\n";
 
-        shell_exec("nohup ".$command." > /dev/null & echo $!");
+        $script_file = $this->getScriptFile($stream);
+        if (file_exists($script_file)) {
+            unlink($script_file);
+        }
+        file_put_contents($script_file, "#!/bin/bash\n".$command."\n");
+        shell_exec("chmod a+x ".$script_file);
+        shell_exec("nohup ".$script_file." > /dev/null & echo $!");
         // FFMPEG dies if we start too many instances too close together talking to the same camera, so pause for a moment.
         sleep(1);
     }
@@ -186,6 +195,7 @@ class WebCamHandler {
         $storedir = $this->getStoreDir($stream, 'segments');
         $m3u8_file = $storedir."/streaming.m3u8";
         file_put_contents($m3u8_file, "#EXTM3U\n");
+        unlink($this->getScriptFile());
     }
 
     function getStoreDir($stream, $type) {
@@ -193,22 +203,15 @@ class WebCamHandler {
         return $this->dir."/".$type."/".$this->camkey."-".$stream['bitrate_kbps'];
     }
 
+    function getScriptFile($stream) {
+        global $CONFIG;
+        return $CONFIG['tmp_dir']."/".$this->camkey."-".$stream['bitrate_kbps'].".sh";
+    }
+
     function getBaseCommand($stream) {
         global $CONFIG;
 
-/*
-        $command = $CONFIG['ffmpeg']." -loglevel ".$CONFIG['log_level']. " -err_detect ignore_err -bug trunc";
-
-        if ($this->camdata['fix_framerate']) {
-            $command .= " -r ".$stream['frame_rate'];
-        }
-        if (array_key_exists('rtsp_transport', $this->camdata) && $this->camdata['rtsp_transport']) {
-            $command .= " -rtsp_transport ".$this->camdata['rtsp_transport'];
-        }
-        $command .= " -i ".$this->camdata['camera_base_url'].$stream['url_part'];
-*/
-
-        $command = $CONFIG['openrtsp']." -D 10 -v ".$stream['rtsp_params']." -c -b ".($stream['bitrate_kbps']*500)." ".$this->camdata['camera_base_url'].$stream['url_part']." | ";
+        $command = $CONFIG['openrtsp']." -D 10 -v ".$stream['rtsp_params']." -K -c -b ".($stream['bitrate_kbps']*500)." ".$this->camdata['camera_base_url'].$stream['url_part']." | ";
         $command .= $CONFIG['ffmpeg']." -r ".$stream['frame_rate']." -i -";
 
         if ($this->camdata['fix_stream']) {
