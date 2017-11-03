@@ -25,7 +25,11 @@
                 if ($camera->cameraOnline()) {
                     echo "true";
                 } else {
-                    echo "false";
+                    if ($camera->cameraOn()) {
+                        echo "false";
+                    } else {
+                        echo "true";
+                    }
                 } ?>;
             var startTime="<?php echo $camera->startTime(); ?>";
             var endTime="<?php echo $camera->finishTime()." ".date('T'); ?>";

@@ -78,7 +78,7 @@ function camOffline() {
 
     var offline = document.getElementById("offlinewarn");
     if (!cameraOnline) {
-        offline.innerHTML = "The network connection to the webcam seems to have run out of steam.<br />Please come back later after we've cleaned the fire!";
+        offline.innerHTML = "The network connection to the live webcam seems to have run out of steam.<br />Please come back later after we've cleaned the fire!";
     } else {
         if (maintenanceMode) {
             offline.innerHTML = "This webcam is offline for maintenance, sorry for the inconvenience.";
