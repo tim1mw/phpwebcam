@@ -90,7 +90,8 @@ class WebCamHandler {
     }
 
     function cameraOnline() {
-        $countfile = $CONFIG['tmp_dir'].'/'.$this->camkey;
+        global $CONFIG;
+        $countfile = $CONFIG['tmp_dir'].'/'.$this->camkey.'.nettest';
         $fail_count = intval(file_get_contents($countfile));
 
         if ($fail_count >= $CONFIG['max_fail_count']) {
@@ -104,7 +105,7 @@ class WebCamHandler {
 
         if ($this->camdata['ping_test']) {
             $str = exec("ping -c 1 ".$this->camdata['ping_test']);
-            $countfile = $CONFIG['tmp_dir'].'/'.$this->camkey;
+            $countfile = $CONFIG['tmp_dir'].'/'.$this->camkey.'.nettest';
             if (!$str){
                 if (!file_exists($countfile)) {
                     $fail_count = 0;
@@ -125,7 +126,24 @@ class WebCamHandler {
     }
 
     function maintenanceMode() {
-        return $this->camdata['maintenance'];
+        //return $this->camdata['maintenance'];
+        global $CONFIG;
+        $mfile = $CONFIG['tmp_dir'].'/'.$this->camkey.'.maintenance';
+        if (file_exists($mfile)) {
+            return true;
+        } else {
+            return false;
+        }
+    }
+
+    function setMaintenanceMode($mode) {
+        global $CONFIG;
+        $mfile = $CONFIG['tmp_dir'].'/'.$this->camkey.'.maintenance';
+        if ($mode) {
+            file_put_contents($mfile, 'on');
+        } else {
+            unlink($mfile);
+        }
     }
 
     function checkStreams() {
@@ -136,7 +154,7 @@ class WebCamHandler {
             $runcam = $this->cameraOn(true);
         }
 
-        if (!$this->cameraOnlineTest()) {echo "offline\n";
+        if (!$this->cameraOnlineTest()) {
             return;
         }
 

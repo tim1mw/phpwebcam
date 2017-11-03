@@ -18,7 +18,6 @@ $CAMERAS = [
         'name' => '',
         'start' => '',
         'finish' => '',
-        'maintenance' => false,
         'ping_test' => '',
         'camera_base_url' => '',
         'fix_stream' => true,

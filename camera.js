@@ -4,7 +4,7 @@ var view;
 window.addEventListener("load", function () {
     player = videojs('videojs-player');
     setView('live');
-    setInterval(checkCameraStatus, 10000);
+    setInterval(checkCameraStatus, 60000);
 });
 
 function showLiveFeed() {
