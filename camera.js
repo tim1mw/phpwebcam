@@ -77,11 +77,15 @@ function camOffline() {
     document.getElementById("online").style.display='none';
 
     var offline = document.getElementById("offlinewarn");
-    if (maintenanceMode) {
-        offline.innerHTML = "This webcam is offline for maintenance, sorry for the inconvenience.";
+    if (!cameraOnline) {
+        offline.innerHTML = "The network connection to the live webcam seems to have run out of steam.<br />Please come back later after we've cleaned the fire!";
     } else {
-        offline.innerHTML = "This webcam is now offline, operating hours are "+startTime+" to "+endTime+".<br />"+
-            "Please use the links above to browse  video clips and images from the past few days.";
+        if (maintenanceMode) {
+            offline.innerHTML = "This webcam is offline for maintenance, sorry for the inconvenience.";
+        } else {
+            offline.innerHTML = "This webcam is now offline, operating hours are "+startTime+" to "+endTime+".<br />"+
+                "Please use the links above to browse video clips and images from the past few days.";
+        }
     }
     document.getElementById("offline").style.display='block';
 }
@@ -91,7 +95,9 @@ function checkCameraStatus() {
     xhttp.onreadystatechange = function() {
         if (this.readyState == 4 && this.status == 200) {
             var obj = JSON.parse(xhttp.responseText);
+
             maintenanceMode = obj.maintenanceMode;
+            cameraOnline = obj.cameraOnline;
 
             if ( obj.cameraOn != camOn) {
                 camOn = obj.cameraOn;

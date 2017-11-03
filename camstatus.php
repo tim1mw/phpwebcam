@@ -14,6 +14,12 @@ try {
     } else {
         $r->maintenanceMode = $camera->maintenanceMode();
     }
+
+    $r->cameraOnline = $camera->cameraOnline();
+    // If the camera has gone offline during operating hours, override the cameraOn value.
+    if (!$r->cameraOnline && $r->cameraOn) {
+        $r->cameraOn = false;
+    }
 } catch (CameraNotFoundException $e) {
     $r->cameraOn = false;
 }

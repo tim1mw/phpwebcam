@@ -89,8 +89,61 @@ class WebCamHandler {
         }
     }
 
+    function cameraOnline() {
+        global $CONFIG;
+        $countfile = $CONFIG['tmp_dir'].'/'.$this->camkey.'.nettest';
+        $fail_count = intval(file_get_contents($countfile));
+
+        if ($fail_count >= $CONFIG['max_fail_count']) {
+            return false;
+        }
+        return true;
+    }
+
+    function cameraOnlineTest() {
+        global $CONFIG;
+
+        if ($this->camdata['ping_test']) {
+            $str = exec("ping -c 1 ".$this->camdata['ping_test']);
+            $countfile = $CONFIG['tmp_dir'].'/'.$this->camkey.'.nettest';
+            if (!$str){
+                if (!file_exists($countfile)) {
+                    $fail_count = 0;
+                } else {
+                    $fail_count = intval(file_get_contents($countfile));
+                }
+                $fail_count++;
+                file_put_contents($countfile, $fail_count);
+                if ($fail_count >= $CONFIG['max_fail_count']) {
+                    return false;
+                }
+            } else {
+                file_put_contents($countfile, '0');
+            }
+        }
+
+        return true;
+    }
+
     function maintenanceMode() {
-        return $this->camdata['maintenance'];
+        //return $this->camdata['maintenance'];
+        global $CONFIG;
+        $mfile = $CONFIG['tmp_dir'].'/'.$this->camkey.'.maintenance';
+        if (file_exists($mfile)) {
+            return true;
+        } else {
+            return false;
+        }
+    }
+
+    function setMaintenanceMode($mode) {
+        global $CONFIG;
+        $mfile = $CONFIG['tmp_dir'].'/'.$this->camkey.'.maintenance';
+        if ($mode) {
+            file_put_contents($mfile, 'on');
+        } else {
+            unlink($mfile);
+        }
     }
 
     function checkStreams() {
@@ -99,6 +152,10 @@ class WebCamHandler {
             $runcam = true;
         } else {
             $runcam = $this->cameraOn(true);
+        }
+
+        if (!$this->cameraOnlineTest()) {
+            return;
         }
 
         if ($runcam) {
@@ -135,7 +192,7 @@ class WebCamHandler {
     function streamRunning($stream) {
         $url = $this->camdata['camera_base_url'].$stream['url_part'];
 
-        $out = shell_exec("ps -f -C ffmpeg | grep ".$url." | awk '{print $2}'");
+        $out = shell_exec("ps -f -C openRTSP | grep ".$url." | awk '{print $2}'");
         if (strlen($out) > 0) {
             return intval($out);
         }
@@ -163,6 +220,9 @@ class WebCamHandler {
         else {
             shell_exec("rm -f ".$storedir."/*");
         }
+        if (file_exists($m3u8_file)) {
+            unlink($m3u8_file);
+        }
 
         $command = $this->getbaseCommand($stream).' -start_number '.$start_number.
             " ".$CONFIG['ffmpeg_encode']." ".$m3u8_file;
@@ -171,7 +231,13 @@ class WebCamHandler {
 
         echo $command."\n";
 
-        shell_exec("nohup ".$command." > /dev/null & echo $!");
+        $script_file = $this->getScriptFile($stream);
+        if (file_exists($script_file)) {
+            unlink($script_file);
+        }
+        file_put_contents($script_file, "#!/bin/bash\n".$command."\n");
+        shell_exec("chmod a+x ".$script_file);
+        shell_exec("nohup ".$script_file." > /dev/null & echo $!");
         // FFMPEG dies if we start too many instances too close together talking to the same camera, so pause for a moment.
         sleep(1);
     }
@@ -186,6 +252,7 @@ class WebCamHandler {
         $storedir = $this->getStoreDir($stream, 'segments');
         $m3u8_file = $storedir."/streaming.m3u8";
         file_put_contents($m3u8_file, "#EXTM3U\n");
+        unlink($this->getScriptFile());
     }
 
     function getStoreDir($stream, $type) {
@@ -193,18 +260,17 @@ class WebCamHandler {
         return $this->dir."/".$type."/".$this->camkey."-".$stream['bitrate_kbps'];
     }
 
+    function getScriptFile($stream) {
+        global $CONFIG;
+        return $CONFIG['tmp_dir']."/".$this->camkey."-".$stream['bitrate_kbps'].".sh";
+    }
+
     function getBaseCommand($stream) {
         global $CONFIG;
 
-        $command = $CONFIG['ffmpeg']." -loglevel ".$CONFIG['log_level']. " -err_detect ignore_err -bug trunc";
+        $command = $CONFIG['openrtsp']." -D 10 -v ".$stream['rtsp_params']." -K -c -b ".($stream['bitrate_kbps']*500)." ".$this->camdata['camera_base_url'].$stream['url_part']." | ";
+        $command .= $CONFIG['ffmpeg']." -r ".$stream['frame_rate']." -i -";
 
-        if ($this->camdata['fix_framerate']) {
-            $command .= " -r ".$stream['frame_rate'];
-        }
-        if (array_key_exists('rtsp_transport', $this->camdata) && $this->camdata['rtsp_transport']) {
-            $command .= " -rtsp_transport ".$this->camdata['rtsp_transport'];
-        }
-        $command .= " -i ".$this->camdata['camera_base_url'].$stream['url_part'];
         if ($this->camdata['fix_stream']) {
             $command .= " ".$CONFIG['ffmpeg_fix'];
         }

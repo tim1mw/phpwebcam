@@ -9,7 +9,7 @@
         <script type='text/javascript' src="videojs-contrib-hls.min.js"></script>
         <script type='text/javascript'>
             var camKey="<?php echo $camkey ?>";
-            var camOn=<?php if ($camera->cameraOn()) {echo "true";} else {echo "false";} ?>;
+            var camOn=<?php if ($camera->cameraOn() && $camera->cameraOnline()) {echo "true";} else {echo "false";} ?>;
             var maintenanceMode=<?php 
                 if (isAdmin()) {
                     echo "false";
@@ -21,6 +21,16 @@
                     }
                 }
             ?>;
+            var cameraOnline=<?php
+                if ($camera->cameraOnline()) {
+                    echo "true";
+                } else {
+                    if ($camera->cameraOn()) {
+                        echo "false";
+                    } else {
+                        echo "true";
+                    }
+                } ?>;
             var startTime="<?php echo $camera->startTime(); ?>";
             var endTime="<?php echo $camera->finishTime()." ".date('T'); ?>";
         </script>
