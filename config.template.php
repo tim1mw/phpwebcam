@@ -8,7 +8,8 @@ $CONFIG = [
     'log_dir' => '',
     'log_level' => 'debug',
     'segment_time' => 5,
-    'segment_wrap' => 180
+    'segment_wrap' => 180,
+    'max_fail_count' => 10
 ];
 
 $CAMERAS = [
@@ -18,6 +19,7 @@ $CAMERAS = [
         'start' => '',
         'finish' => '',
         'maintenance' => false,
+        'ping_test' => '',
         'camera_base_url' => '',
         'fix_stream' => true,
         'poster_image' => '',

@@ -89,6 +89,41 @@ class WebCamHandler {
         }
     }
 
+    function cameraOnline() {
+        $countfile = $CONFIG['tmp_dir'].'/'.$this->camkey;
+        $fail_count = intval(file_get_contents($countfile));
+
+        if ($fail_count >= $CONFIG['max_fail_count']) {
+            return false;
+        }
+        return true;
+    }
+
+    function cameraOnlineTest() {
+        global $CONFIG;
+
+        if ($this->camdata['ping_test']) {
+            $str = exec("ping -c 1 ".$this->camdata['ping_test']);
+            $countfile = $CONFIG['tmp_dir'].'/'.$this->camkey;
+            if (!$str){
+                if (!file_exists($countfile)) {
+                    $fail_count = 0;
+                } else {
+                    $fail_count = intval(file_get_contents($countfile));
+                }
+                $fail_count++;
+                file_put_contents($countfile, $fail_count);
+                if ($fail_count >= $CONFIG['max_fail_count']) {
+                    return false;
+                }
+            } else {
+                file_put_contents($countfile, '0');
+            }
+        }
+
+        return true;
+    }
+
     function maintenanceMode() {
         return $this->camdata['maintenance'];
     }
@@ -99,6 +134,10 @@ class WebCamHandler {
             $runcam = true;
         } else {
             $runcam = $this->cameraOn(true);
+        }
+
+        if (!$this->cameraOnlineTest()) {echo "offline\n";
+            return;
         }
 
         if ($runcam) {
