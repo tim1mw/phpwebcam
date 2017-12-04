@@ -31,8 +31,9 @@ function getStreams($camera) {
     $str = "";
     $streams = $camera->getStreams();
     foreach ($streams as $stream) {
-        $file = "segments/".$camkey."-".$stream['bitrate_kbps']."/streaming.m3u8";
+        $file = "segments/".$camera->getCamKey()."-".$stream['bitrate_kbps']."/streaming.m3u8";
         // Check the file exists, if not wait for the length of a segment before trying a second time and then skip it if it's still missing
+
         if (file_exists($file)) {
             $str.= "#EXT-X-STREAM-INF:PROGRAM-ID=1,BANDWIDTH=".($stream['bitrate_kbps']*1000)."\n";
             $str.= $file."\n";
