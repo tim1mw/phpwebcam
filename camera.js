@@ -19,28 +19,21 @@ function showLiveFeed() {
 }
 
 function showClips() {
-    player.pause();
-    document.getElementById("live").style.display='none';
-    view = 'clips';
-    var other = document.getElementById("other");
-
-    var xhttp = new XMLHttpRequest();
-    xhttp.onreadystatechange = function() {
-        if (this.readyState == 4 && this.status == 200) {
-            other.innerHTML = xhttp.responseText;
-        }
-    }
-
-    xhttp.open("GET", "/clipview.php?camkey="+camKey, true);
-    xhttp.send();
-
-    other.style.display='block';
+    showOther("/clipview.php?camkey="+camKey, "clips");
 }
 
 function showImages() {
+    showOther("/stillview.php?camkey="+camKey, "images");
+}
+
+function showHelp() {
+    showOther("/help.html", "help");
+}
+
+function showOther(url, name) {
     player.pause();
     document.getElementById("live").style.display='none';
-    view = 'images';
+    view = name;
     var other = document.getElementById("other");
 
     var xhttp = new XMLHttpRequest();
@@ -50,7 +43,7 @@ function showImages() {
         }
     }
 
-    xhttp.open("GET", "/stillview.php?camkey="+camKey, true);
+    xhttp.open("GET", url, true);
     xhttp.send();
     other.style.display='block';
 }
@@ -123,6 +116,9 @@ function setView(view) {
     }
     if (view=='image') {
          showImages();
+    }
+    if (view=='help') {
+         showHelp();
     }
 
     document.getElementById("link-live").style.background="#333333";

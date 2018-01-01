@@ -49,6 +49,9 @@
                      <td class='link' id='link-image'>
                          <a href="javascript:setView('image');" title="Look at selected images from the past few days">Still Images</a>
                      </td>
+                     <td class='link' id='link-image'>
+                         <a href="javascript:setView('help');" title="Help for the webcam">Help</a>
+                     </td>
                 </tr>
             </table></div>
             <div class="inner-container">
