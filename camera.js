@@ -124,6 +124,7 @@ function setView(view) {
     document.getElementById("link-live").style.background="#333333";
     document.getElementById("link-clip").style.background="#333333";
     document.getElementById("link-image").style.background="#333333";
+    document.getElementById("link-help").style.background="#333333";
 
     var ele = document.getElementById("link-"+view);
     ele.style.background="#880000";
