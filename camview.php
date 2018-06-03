@@ -6,7 +6,6 @@
         <link href="video-js.min.css" rel="stylesheet" />
         <link href="style-cam.css" rel="stylesheet" />
         <script type='text/javascript' src="video.min.js"></script>
-        <script type='text/javascript' src="videojs-contrib-hls.min.js"></script>
         <script type='text/javascript'>
             var camKey="<?php echo $camkey ?>";
             var camOn=<?php if ($camera->cameraOn() && $camera->cameraOnline()) {echo "true";} else {echo "false";} ?>;
