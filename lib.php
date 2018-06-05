@@ -33,6 +33,13 @@ class WebCamHandler {
     }
 
     function getPosterImage() {
+        // If there is no poster, use the most recent still
+        if ($this->camdata['poster_image'] === false) {
+            $stream = $this->firstStream();
+            $images = $this->getFiles($this->getStoreDir($stream, 'stills', false)."/*.jpg");
+            return 'stills/'.$this->camkey.'/'.basename($images[1]);
+        }
+
         return "images/".$this->camdata['poster_image'];
     }
 
