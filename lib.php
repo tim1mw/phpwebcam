@@ -259,9 +259,13 @@ class WebCamHandler {
         unlink($this->getScriptFile());
     }
 
-    function getStoreDir($stream, $type) {
+    function getStoreDir($stream, $type, $bps=true) {
         global $CONFIG;
-        return $this->dir."/".$type."/".$this->camkey."-".$stream['bitrate_kbps'];
+        $sdir = $this->dir."/".$type."/".$this->camkey;
+        if ($bps) {
+            $sdir.="-".$stream['bitrate_kbps'];
+        }
+        return $sdir;
     }
 
     function getScriptFile($stream) {
@@ -310,7 +314,7 @@ class WebCamHandler {
         }
 
         $stream = $this->firstStream();
-        $storedir = $this->getStoreDir($stream, 'stills');
+        $storedir = $this->getStoreDir($stream, 'stills', false);
 
         if (!file_exists($storedir)) {
             mkdir($storedir);
@@ -330,7 +334,7 @@ class WebCamHandler {
 
         $this->makeThumb($saveto.".jpg", $saveto."-thumb.jpg", 125);
 
-        $images = $this->getFiles($this->getStoreDir($stream, 'stills')."/*jpg");
+        $images = $this->getFiles($storedir."/*jpg");
         $maximage = 70;
         if (count($images) > $maximage) {
             for ($loop=$maximage+1 ; $loop<count($images); $loop++) {
@@ -382,13 +386,13 @@ class WebCamHandler {
 
     function getThumbnails() {
         $stream = $this->firstStream();
-        $images = $this->getFiles($this->getStoreDir($stream, 'stills')."/*thumb.jpg");
+        $images = $this->getFiles($this->getStoreDir($stream, 'stills', false)."/*thumb.jpg");
 
         $paths=array();
         $count=0;
         foreach ($images as $image) {
             $path = new stdclass();
-            $path->thumb = 'stills/'.$this->camkey."-".$stream['bitrate_kbps'].'/'.basename($image);
+            $path->thumb = 'stills/'.$this->camkey.'/'.basename($image);
             $path->img = str_replace('-thumb.jpg', '.jpg', $path->thumb);
             // Check that the actual full size still exists, just in case it got deleted manually or the time stamp got changed causing early deletion
             if (!file_exists($path->img)) {
@@ -404,20 +408,20 @@ class WebCamHandler {
 
     function getVideoClips() {
         $stream = $this->firstStream();
-        $clips = $this->getFiles($this->getStoreDir($stream, 'vclips')."/*");
+        $clips = $this->getFiles($this->getStoreDir($stream, 'vclips', false)."/*");
 
         $paths=array();
         $count=0;
         foreach ($clips as $clip) {
             $path = new stdclass();
             $b = basename($clip);
-            $path->thumb = 'vclips/'.$this->camkey."-".$stream['bitrate_kbps'].'/'.$b.'/thumb.jpg';
+            $path->thumb = 'vclips/'.$this->camkey.'/'.$b.'/thumb.jpg';
             // If the thumbnail file is missing, something must have gone wrong capturing the clip, so skip it
             if (!file_exists($path->thumb)) {
                 continue;
             }
-            $path->link = 'clipshow.php?camkey='.$this->camkey."&amp;stream=".$stream['bitrate_kbps']."&amp;clip=".$b;
-            $path->time = file_get_contents('vclips/'.$this->camkey."-".$stream['bitrate_kbps'].'/'.$b.'/date.txt');
+            $path->link = 'clipshow.php?camkey='.$this->camkey."&amp;clip=".$b;
+            $path->time = file_get_contents('vclips/'.$this->camkey.'/'.$b.'/date.txt');
             $paths[] = $path;
             $count++;
             if ($count>=30) break;
@@ -448,7 +452,7 @@ class WebCamHandler {
 
         $stream = $this->firstStream();
 
-        $storedir = $this->getStoreDir($stream, 'vclips');
+        $storedir = $this->getStoreDir($stream, 'vclips', false);
         if (!file_exists($storedir)) {
             mkdir($storedir);
         }
@@ -482,7 +486,7 @@ class WebCamHandler {
         shell_exec($CONFIG['ffmpeg']." -loglevel panic -i ".$saveto."/combined.ts -hls_playlist_type vod -acodec copy -vcodec copy -hls_list_size 0 -hls_time ".$CONFIG['segment_time']." ".$saveto."/clip.m3u8");
         unlink($saveto."/combined.ts");
 
-        $vclips = $this->getFiles($this->getStoreDir($stream, 'vclips')."/*");
+        $vclips = $this->getFiles($storedir."/*");
         $maxvclip = 30;
         if (count($vclips) > $maxvclip) {
             for ($loop=$maxvclip+1; $loop<count($vclips); $loop++) {

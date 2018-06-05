@@ -2,9 +2,8 @@
 
 include('setup.php');
 
-$stream = $_GET['stream'];
 $clip = $_GET['clip'];
-$title = $camera->getName()." - ".file_get_contents('vclips/'.$camera->getCamKey().'-'.$stream.'/'.$clip.'/date.txt');
+$title = $camera->getName()." - ".file_get_contents('vclips/'.$camera->getCamKey().'/'.$clip.'/date.txt');
 ?>
 <!doctype html>
 <html>
@@ -29,9 +28,9 @@ $title = $camera->getName()." - ".file_get_contents('vclips/'.$camera->getCamKey
                        data-setup='{
                             "controls": true,
                             "autoplay": false,
-                            "poster": "vclips/<?php echo $camera->getCamKey().'-'.$stream.'/'.$clip.'/image.jpg' ?>",
+                            "poster": "vclips/<?php echo $camera->getCamKey().'/'.$clip.'/image.jpg' ?>",
                             "controlBar": { "muteToggle": false, "volume": false }}'>
-                    <source src="vclips/<?php echo $camera->getCamKey().'-'.$stream.'/'.$clip.'/clip.m3u8'?>" type="application/x-mpegURL">
+                    <source src="vclips/<?php echo $camera->getCamKey().'/'.$clip.'/clip.m3u8'?>" type="application/x-mpegURL">
                 </video>
             </div>
         </div>
