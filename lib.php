@@ -70,6 +70,16 @@ class WebCamHandler {
         return time("Y-m-d H:i", $date);
     }
 
+    function getMaintenanceMessage() {
+        global $CONFIG;
+        $mfile = $CONFIG['tmp_dir'].'/'.$this->camkey.'.message';
+        if (file_exists($mfile)) {
+            echo file_get_contents($mfile);
+        } else {
+            return "This webcam is offline for maintenance, sorry for the inconvenience.";
+        }
+    }
+
     private function convertDate($date) {
         return substr($date, 0, 2).":".substr($date, 2);
     }

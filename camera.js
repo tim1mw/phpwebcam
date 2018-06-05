@@ -74,13 +74,26 @@ function camOffline() {
         offline.innerHTML = "The network connection to the live webcam seems to have run out of steam.<br />Please come back later after we've cleaned the fire!";
     } else {
         if (maintenanceMode) {
-            offline.innerHTML = "This webcam is offline for maintenance, sorry for the inconvenience.";
+            setMaintenanceMessage();
         } else {
             offline.innerHTML = "This webcam is now offline, operating hours are "+startTime+" to "+endTime+".<br />"+
                 "Please use the links above to browse video clips and images from the past few days.";
         }
     }
     document.getElementById("offline").style.display='block';
+}
+
+function setMaintenanceMessage() {
+    var xhttp = new XMLHttpRequest();
+    xhttp.onreadystatechange = function() {
+        if (this.readyState == 4 && this.status == 200) {
+            var offline = document.getElementById("offlinewarn");
+            offline.innerHTML = xhttp.responseText;
+        }
+    }
+
+    xhttp.open("GET", "/maintenance.php?camkey="+camKey, true);
+    xhttp.send();
 }
 
 function checkCameraStatus() {

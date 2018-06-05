@@ -56,6 +56,17 @@ function adminOptions() {
 
     ?>
     <p>Logged in as admin</p><p><a href='admin.php?logout'>Logout</a></p>
+
+    <?php
+    if (array_key_exists('message', $_GET)) {
+        showMaintenanceMessageForm();
+    }
+
+    if (array_key_exists('mmessage', $_POST)) {
+        updateMaintenanceMessage();
+    }
+    ?>
+
     <h4>Available cameras</h4>
     <table style="border:1px solid black";>
         <tr>
@@ -83,11 +94,51 @@ function adminOptions() {
                 "    <td style='border:1px solid black;text-align:center;'>".$camera->streamStatus()."</td>".
                 "    <td style='border:1px solid black;text-align:center;'>".$mm."</td>".
                 "    <td style='border:1px solid black;'>".
-                "        <a href='/camrestart.php?camkey=".$camkey."'>Restart feed</a><br />".$mmm.
+                "        <a href='/camrestart.php?camkey=".$camkey."'>Restart feed</a><br />".
+                "        <a href='/admin.php?camkey=".$camkey."&message=1'>Set Maintenance Message</a><br />".
+                $mmm.
                 "    </td>\n".
                 "</tr>";
         }
         ?>
     </table>
 <?php
+
+}
+
+function showMaintenanceMessageForm() {
+    global $CONFIG;
+    $camera = new WebCamHandler($_GET['camkey']);
+    $mfile = $CONFIG['tmp_dir'].'/'.$camera->getCamKey().'.message';
+    if (file_exists($mfile)) {
+        $mm = file_get_contents($mfile);
+    } else {
+        $mm = "";
+    }
+    ?>
+    <hr />
+    <h4>Set maintenance message for : <?php echo $camera->getName(); ?></h4>
+    <p><form action="admin.php" method="post">
+        <input type="hidden" name="camkey" value="<?php echo $camera->getCamKey();?>" />
+        <textarea cols="80" rows="5" name="mmessage"><?php echo $mm; ?></textarea>
+        <input type="submit" value="Update" />
+    </form></p>
+    <hr />
+    <?php
+}
+
+function updateMaintenanceMessage() {
+    global $CONFIG;
+    $camera = new WebCamHandler($_POST['camkey']);
+    $mfile = $CONFIG['tmp_dir'].'/'.$camera->getCamKey().'.message';
+
+    $mmessage = trim($_POST['mmessage']);
+    if (strlen($mmessage)===0) {
+        unlink($mfile);
+        echo "<p>Default maintenance message restored for ".$camera->getName().".</p>";
+        return;
+    }
+
+    file_put_contents($mfile, $mmessage);
+    echo "<p>Maintenance message updated for ".$camera->getName().".</p>";
 }
