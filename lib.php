@@ -203,6 +203,10 @@ class WebCamHandler {
     function startStream($stream) {
         global $CONFIG;
         $storedir = $this->getStoreDir($stream, 'segments');
+        if (!file_exists($storedir)) {
+            mkdir($storedir);
+        }
+
         $m3u8_file = $storedir."/streaming.m3u8";
         $start_number = 0;
         // If the m3u8 file exists and is less than 3 mins old, try setting the media sequence to persuade clients to continue playing.
@@ -278,6 +282,7 @@ class WebCamHandler {
             " -segment_list_flags +live -hls_allow_cache 0 ".
             " -hls_flags temp_file+omit_endlist+discont_start -hls_time ".$CONFIG['segment_time'].
             " -hls_wrap ".$CONFIG['segment_wrap'].
+            " -hls_list_size 15 ".
             " -muxpreload 15 -muxdelay 15";
             //" -hls_flags delete_segments -hls_list_size ".$CONFIG['segment_wrap'];
 
@@ -305,7 +310,13 @@ class WebCamHandler {
         }
 
         $stream = $this->firstStream();
-        $saveto = $this->getStoreDir($stream, 'stills')."/".date('Ymd')."-".$time;
+        $storedir = $this->getStoreDir($stream, 'stills');
+
+        if (!file_exists($storedir)) {
+            mkdir($storedir);
+        }
+
+        $saveto = $storedir."/".date('Ymd')."-".$time;
 
         if (file_exists($saveto.".jpg")) {
             return;
@@ -436,7 +447,13 @@ class WebCamHandler {
         }
 
         $stream = $this->firstStream();
-        $saveto = $this->getStoreDir($stream, 'vclips')."/".date('Ymd')."-".$time;
+
+        $storedir = $this->getStoreDir($stream, 'vclips');
+        if (!file_exists($storedir)) {
+            mkdir($storedir);
+        }
+
+        $saveto = $storedir."/".date('Ymd')."-".$time;
 
         if (file_exists($saveto)) {
             return;
