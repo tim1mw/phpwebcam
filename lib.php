@@ -231,7 +231,7 @@ class WebCamHandler {
         $command = $this->getbaseCommand($stream).' -start_number '.$start_number.
             " ".$CONFIG['ffmpeg_encode']." ".$m3u8_file;
 
-        $command .= " > ".$CONFIG['log_dir']."/".$stream['url_part']."_".date('Y-m-d_H:i:s').".log 2>&1";
+        $command .= " > ".$CONFIG['log_dir']."/".$this->camkey."_".$stream['url_part']."_".date('Y-m-d_H:i:s').".log 2>&1";
 
         echo $command."\n";
 
