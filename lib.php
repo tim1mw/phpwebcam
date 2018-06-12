@@ -37,7 +37,10 @@ class WebCamHandler {
         if ($this->camdata['poster_image'] === false) {
             $stream = $this->firstStream();
             $images = $this->getFiles($this->getStoreDir($stream, 'stills', false)."/*.jpg");
-            return 'stills/'.$this->camkey.'/'.basename($images[1]);
+            if (array_key_exists(1, $images) && file_exists($images[1])) {
+                return 'stills/'.$this->camkey.'/'.basename($images[1]);
+            }
+            return '';
         }
 
         return "images/".$this->camdata['poster_image'];
