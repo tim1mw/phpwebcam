@@ -273,7 +273,7 @@ class WebCamHandler {
         $storedir = $this->getStoreDir($stream, 'segments');
         $m3u8_file = $storedir."/streaming.m3u8";
         file_put_contents($m3u8_file, "#EXTM3U\n");
-        unlink($this->getScriptFile());
+        unlink($this->getScriptFile($stream));
     }
 
     function getStoreDir($stream, $type, $bps=true) {
