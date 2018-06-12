@@ -241,21 +241,17 @@ class WebCamHandler {
         $start_number = 0;
         // If the m3u8 file exists and is less than 3 mins old, try setting the media sequence to persuade clients to continue playing.
         if (file_exists($m3u8_file) && time()-filemtime($m3u8_file) < 180) {
-            $m3u8 = file_get_contents($m3u8_file);
+            $m3u8 = trim(file_get_contents($m3u8_file));
             $m3u8_parts = explode("\n", $m3u8);
-            foreach ($m3u8_parts as $part) {
-                $elements = explode(':', $part);
-                if ($elements[0] == "#EXT-X-MEDIA-SEQUENCE") {
-                    $start_number = intval($elements[1])+5;
-                    break;
-                }
-            }
+            // The last line should be the most recent segment written, get it's number and add 1
+            $last = end($m3u8_parts);
+            $last = substr($last, 9);
+            $index = strpos($last, '.');
+            $last = substr($last, 0, $index);
+            $start_number = intval($last)+1;
         }
         else {
             shell_exec("rm -f ".$storedir."/*");
-        }
-        if (file_exists($m3u8_file)) {
-            unlink($m3u8_file);
         }
 
         $command = $this->getbaseCommand($stream).' -start_number '.$start_number.
@@ -264,6 +260,8 @@ class WebCamHandler {
         $command .= " > ".$CONFIG['log_dir']."/".$this->camkey."_".$stream['url_part']."_".date('Y-m-d_H:i:s').".log 2>&1";
 
         echo $command."\n";
+        ob_flush();
+        flush();
 
         $script_file = $this->getScriptFile($stream);
         if (file_exists($script_file)) {
@@ -325,7 +323,7 @@ class WebCamHandler {
         }
         $command .= " -bufsize ".($stream['bitrate_kbps']*2000)." -stimeout 60000".
             " -segment_list_flags +live -hls_allow_cache 0 ".
-            " -hls_flags temp_file+omit_endlist+discont_start -hls_time ".$CONFIG['segment_time'].
+            " -hls_flags temp_file+omit_endlist -hls_time ".$CONFIG['segment_time'].
             " -hls_wrap ".$CONFIG['segment_wrap'].
             " -hls_list_size 15 ".
             " -muxpreload 15 -muxdelay 15";
