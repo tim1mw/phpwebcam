@@ -310,7 +310,8 @@ class WebCamHandler {
 
         switch ($this->camdata['stream_type']) {
             case 'rtsp':
-                $command .= $CONFIG['openrtsp']." -D 10 -v ".$stream['rtsp_params']." -c -b ".($stream['bitrate_kbps']*500)." ".$this->camdata['camera_base_url'].$stream['url_part']." | ";
+                $command .= $CONFIG['openrtsp']." -D 10 -v ".$stream['rtsp_params']." -c -b ".($stream['bitrate_kbps']*20000).
+                    " -B ".($stream['bitrate_kbps']*20000)." ".$this->camdata['camera_base_url'].$stream['url_part']." | ";
                 $command .= $CONFIG['ffmpeg']." -r ".$stream['frame_rate']." -i -";
                 break;
             case 'rtmp':
@@ -322,7 +323,7 @@ class WebCamHandler {
         if ($this->camdata['fix_stream']) {
             $command .= " ".$CONFIG['ffmpeg_fix'];
         }
-        $command .= " -bufsize ".($stream['bitrate_kbps']*7)."k -stimeout 60000".
+        $command .= " -bufsize ".($stream['bitrate_kbps']*2000)." -stimeout 60000".
             " -segment_list_flags +live -hls_allow_cache 0 ".
             " -hls_flags temp_file+omit_endlist+discont_start -hls_time ".$CONFIG['segment_time'].
             " -hls_wrap ".$CONFIG['segment_wrap'].
