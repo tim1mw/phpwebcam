@@ -109,6 +109,9 @@ class WebCamHandler {
     function cameraOnline() {
         global $CONFIG;
         $countfile = $CONFIG['tmp_dir'].'/'.$this->camkey.'.nettest';
+        if (!file_exists($countfile)) {
+            $this->cameraOnlineTest();
+        }
         $fail_count = intval(file_get_contents($countfile));
 
         if ($fail_count >= $CONFIG['max_fail_count']) {
