@@ -7,6 +7,9 @@
         <link href="style-cam.css" rel="stylesheet" />
         <script type='text/javascript' src="video.min.js"></script>
         <script type='text/javascript'>
+            videojs.Hls.GOAL_BUFFER_LENGTH = 50;
+            videojs.Hls.MAX_GOAL_BUFFER_LENGTH = 100;
+
             var camKey="<?php echo $camkey ?>";
             var camOn=<?php if ($camera->cameraOn() && $camera->cameraOnline()) {echo "true";} else {echo "false";} ?>;
             var maintenanceMode=<?php 
