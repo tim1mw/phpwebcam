@@ -37,8 +37,10 @@ class WebCamHandler {
         if ($this->camdata['poster_image'] === false) {
             $stream = $this->firstStream();
             $images = $this->getFiles($this->getStoreDir($stream, 'stills', false)."/*.jpg");
-            if (array_key_exists(1, $images) && file_exists($images[1])) {
-                return 'stills/'.$this->camkey.'/'.basename($images[1]);
+            foreach ($images as $image) {
+                if (file_exists($image) && strpos($image, "thumb") !== false) {
+                    return 'stills/'.$this->camkey.'/'.basename($images[0]);
+                }
             }
             return '';
         }
@@ -308,7 +310,7 @@ class WebCamHandler {
 
         switch ($this->camdata['stream_type']) {
             case 'rtsp':
-                $command .= $CONFIG['openrtsp']." -D 10 -v ".$stream['rtsp_params']." -c -b ".($stream['bitrate_kbps']*20000).
+                $command .= $CONFIG['openrtsp']." -D 30 -v ".$stream['rtsp_params']." -c -b ".($stream['bitrate_kbps']*20000).
                     " -B ".($stream['bitrate_kbps']*20000)." ".$this->camdata['camera_base_url'].$stream['url_part']." | ";
                 $command .= $CONFIG['ffmpeg']." -r ".$stream['frame_rate']." -i -";
                 break;
