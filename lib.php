@@ -222,6 +222,7 @@ class WebCamHandler {
                $out = shell_exec("ps -f -C openRTSP | grep ".$url." | awk '{print $2}'");
                break;
             case 'rtmp':
+            case 'rtsplisten':
                $out = shell_exec("ps -f -C ffmpeg | grep ".$url." | awk '{print $2}'");
         }
         
@@ -319,6 +320,8 @@ class WebCamHandler {
                 if (array_key_exists('username', $this->camdata)) {
                     $command .= ":".$this->camdata['username'].":".$this->camdata['password'];
                 }
+            case 'rtsplisten':
+                $command .= $CONFIG['ffmpeg']." -rtsp_flags listen -timeout -1 -i ".$this->camdata['camera_base_url'];
                 break;
         }
 
