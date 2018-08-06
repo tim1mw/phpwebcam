@@ -321,7 +321,7 @@ class WebCamHandler {
                     $command .= ":".$this->camdata['username'].":".$this->camdata['password'];
                 }
             case 'rtsplisten':
-                $command .= $CONFIG['ffmpeg']." -rtsp_flags listen -timeout -1 -i ".$this->camdata['camera_base_url'];
+                $command .= $CONFIG['ffmpeg']." -analyzeduration 2147483647 -probesize 2147483647 -rtsp_flags listen -timeout -1 -i ".$this->camdata['camera_base_url']."  -use_wallclock_as_timestamps 1";
                 break;
         }
 
