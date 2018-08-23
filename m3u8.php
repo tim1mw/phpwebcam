@@ -28,6 +28,7 @@ try {
 }
 
 function getStreams($camera) {
+    global $CONFIG;
     $str = "";
     $streams = $camera->getStreams();
     foreach ($streams as $stream) {
