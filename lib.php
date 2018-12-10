@@ -263,7 +263,9 @@ class WebCamHandler {
         $command .= " > ".$CONFIG['log_dir']."/".$this->camkey."_".$stream['url_part']."_".date('Y-m-d_H:i:s').".log 2>&1";
 
         echo $command."\n";
-        ob_flush();
+        if (php_sapi_name() != "cli") {
+            ob_flush();
+        }
         flush();
 
         $script_file = $this->getScriptFile($stream);
@@ -546,6 +548,10 @@ class WebCamHandler {
 
 
 function isAdmin() {
+    if (php_sapi_name() == "cli") {
+        return true;
+    }
+
     if (session_status() == PHP_SESSION_NONE) {
         session_start();
     }
