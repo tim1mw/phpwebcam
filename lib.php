@@ -331,10 +331,10 @@ class WebCamHandler {
         if ($this->camdata['fix_stream']) {
             $command .= " ".$CONFIG['ffmpeg_fix'];
         }
-        $command .= " -bufsize ".($stream['bitrate_kbps']*2000)." -stimeout 60000".
+        $command .= " -bufsize ".($stream['bitrate_kbps']*2000)." -timeout 60".
             " -segment_list_flags +live -hls_allow_cache 0 ".
             " -hls_flags temp_file+omit_endlist -hls_time ".$CONFIG['segment_time'].
-            " -hls_wrap ".$CONFIG['segment_wrap'].
+            " -segment_wrap ".$CONFIG['segment_wrap'].
             " -hls_list_size 15 ".
             " -muxpreload 15 -muxdelay 15";
             //" -hls_flags delete_segments -hls_list_size ".$CONFIG['segment_wrap'];
