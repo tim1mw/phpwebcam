@@ -241,6 +241,7 @@ class WebCamHandler {
         }
 
         $m3u8_file = $storedir."/streaming.m3u8";
+        $ts_file = $storedir."/streaming%d.ts";
         $start_number = 0;
         // If the m3u8 file exists and is less than 3 mins old, try setting the media sequence to persuade clients to continue playing.
         if (file_exists($m3u8_file) && time()-filemtime($m3u8_file) < 180) {
@@ -257,8 +258,8 @@ class WebCamHandler {
             shell_exec("rm -f ".$storedir."/*");
         }
 
-        $command = $this->getbaseCommand($stream).' -start_number '.$start_number.
-            " ".$CONFIG['ffmpeg_encode']." ".$m3u8_file;
+        $command = $this->getbaseCommand($stream, $m3u8_file, $start_number).
+            " ".$CONFIG['ffmpeg_encode']." ".$ts_file;
 
         $command .= " > ".$CONFIG['log_dir']."/".$this->camkey."_".$stream['url_part']."_".date('Y-m-d_H:i:s').".log 2>&1";
 
@@ -306,7 +307,7 @@ class WebCamHandler {
         return $CONFIG['tmp_dir']."/".$this->camkey."-".$stream['bitrate_kbps'].".sh";
     }
 
-    function getBaseCommand($stream) {
+    function getBaseCommand($stream, $m3u8_file, $start_number) {
         global $CONFIG;
 
         $command = "";
@@ -331,6 +332,7 @@ class WebCamHandler {
         if ($this->camdata['fix_stream']) {
             $command .= " ".$CONFIG['ffmpeg_fix'];
         }
+/*
         $command .= " -bufsize ".($stream['bitrate_kbps']*2000)." -timeout 60".
             " -segment_list_flags +live -hls_allow_cache 0 ".
             " -hls_flags temp_file+omit_endlist -hls_time ".$CONFIG['segment_time'].
@@ -338,6 +340,15 @@ class WebCamHandler {
             " -hls_list_size 15 ".
             " -muxpreload 15 -muxdelay 15";
             //" -hls_flags delete_segments -hls_list_size ".$CONFIG['segment_wrap'];
+*/
+
+        $command .= " -bufsize ".($stream['bitrate_kbps']*2000)." -timeout 60".
+            " -muxpreload 15 -muxdelay 15".
+            " -f segment -segment_list ".$m3u8_file.
+            " -segment_list_flags +live -segment_wrap ".$CONFIG['segment_wrap'].
+            " -hls_allow_cache 0 -hls_flags temp_file+omit_endlist ".
+            " -segment_time ".$CONFIG['segment_time'].
+            " -start_number ".$start_number;
 
         return $command;
     }
